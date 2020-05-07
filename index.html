@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>瀑布流组件开发demo</title>
+	<script src="./vue.js"></script>
+
+</head>
+<body>
+	<div id="app">
+<img class="wf-img" :style="box"  src="./static/001.jpg" alt="">
+<img class="wf-img" :style="box"  src="./static/002.jpg" alt="">
+<img class="wf-img" :style="box"  src="./static/003.jpg" alt="">
+<img class="wf-img" :style="box"  src="./static/004" alt="">
+<img class="wf-img" :style="box"  src="./static/005.jpg" alt="">
+<img class="wf-img" :style="box"  src="./static/006.jpg" alt="">
+<img class="wf-img" :style="box"  src="./static/007.jpg" alt="">
+<img class="wf-img" :style="box"  src="./static/008.jpg" alt="">
+<img class="wf-img" :style="box"  src="./static/009.jpg" alt="">
+<img class="wf-img" :style="box"  src="./static/010.jpg" alt="">
+<img class="wf-img" :style="box"  src="./static/011.jpg" alt="">
+<img class="wf-img" :style="box"  src="./static/012.jpg" alt="">	
+<img class="wf-img" :style="box"  src="./static/014.jpg" alt="">
+<img class="wf-img" :style="box"  src="./static/015.jpg" alt="">
+	</div>
+</body>
+<script>
+	var vm = new Vue({
+		el:"#app",
+		data:{
+			title:"瀑布流组件开发demo",
+			colWidth:300,/*这个是图片宽度选项*/
+			unit:'px', /*这个是设置单位*/
+			gutter:10,/*这个是设置槽宽*/
+			heightArr:[]
+		},
+		computed:{
+			box(){
+				let width = this.colWidth+this.unit
+				return {
+					width
+				}
+			}
+		},
+		mounted(){
+			//获取视图宽度
+			let clientHeight = document.documentElement.clientWidth
+			//计算列数
+			let cols = parseInt(clientHeight/(this.colWidth+this.gutter))
+			console.log('计算列数',cols)
+			//获取所有的img对象
+			let box = document.querySelectorAll(".wf-img")
+			console.log('获取所有的img对象',box)
+			//获取外围div的元素
+			let wrap = document.getElementById('app')
+			
+			//图片遍历循环
+			let that = this
+
+			box.forEach((item,index)=>{	//IE8以下不支持
+				if(index<cols){//	如果是第一排，只需要记录每个的高度
+					that.heightArr[index] = item.height
+				}else{//	如果不是第一排，就要定位处理
+					console.log(that.heightArr)
+					//找出最小高度的那个
+					let minHeight = Math.min(...that.heightArr)//ES6语法，兼容ES5请用翻译工具
+					//找出最小高度的那个的索引
+					let minIndex = that.heightArr.indexOf(minHeight)
+					//更改样式
+					item.style.position = "absolute"
+					item.style.left = minIndex * that.colWidth + that.unit
+					item.style.top = minHeight + that.unit
+					//追加高度
+					that.heightArr[minIndex] += item.height
+					wrap.style.height = minHeight+item.height + that.unit
+
+				}
+			})
+		}
+	})
+</script>
+<style>
+	* {
+		padding: 0;
+		margin: 0;
+	}
+	html,body {
+		height: 100%
+	}
+	#app {
+		letter-spacing:-100px;
+		overflow: hidden;
+	}
+	#app img{
+		vertical-align: top;
+		padding :0;
+		margin-left :0;
+	}
+</style>
+</html>
